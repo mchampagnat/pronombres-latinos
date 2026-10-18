@@ -402,6 +402,19 @@ const PRONOUNS = {
 };
 
 const COLS = ['Masc. sg.','Fem. sg.','Neut. sg.','Masc. pl.','Fem. pl.','Neut. pl.'];
+PRONOUNS['qui-quae-quod'] = {
+  label: 'qui, quae, quod',
+  meaning: 'que, quien, el cual (relativo)',
+  cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+  forms: {
+    'Nom.': ['qui','quae','quod','qui','quae','quae'],
+    'Acus.': ['quem','quam','quod','quos','quas','quae'],
+    'Gen.': ['cuius','cuius','cuius','quorum','quarum','quorum'],
+    'Dat.': ['cui','cui','cui','quibus','quibus','quibus'],
+    'Abl.': ['quo','qua','quo','quibus','quibus','quibus'],
+  }
+};
+
 const PRONOUN_KEYS = Object.keys(PRONOUNS);
 
 // ═══════════════════════════════════════════════════════════════
