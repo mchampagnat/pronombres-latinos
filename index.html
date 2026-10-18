@@ -519,19 +519,22 @@ function renderIdentify() {
       </table>
       <div class="btn-row">
         <button class="btn btn-primary" id="btn-verify">Verificar</button>
-        <button class="btn btn-secondary hidden" id="btn-next">Siguiente</button>
+        <button class="btn btn-secondary hidden" id="btn-next">Siguiente (azaroso)</button>
+        <button class="btn btn-secondary hidden" id="btn-next-choose">Siguiente (elegir grupo)</button>
       </div>
       <div class="legend hidden" id="legend">
         <div class="legend-item"><div class="legend-dot" style="background:var(--correct-bg);border:1px solid var(--correct)"></div> Correcto</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--wrong-bg);border:1px solid var(--wrong)"></div> Incorrecto</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--missed-bg);border:1px solid var(--missed)"></div> Faltaba marcar</div>
       </div>
+      <div id="group-picker-identify" class="hidden" style="margin-top:1rem;"></div>
     </div>`;
 
   document.getElementById('exercise-area').innerHTML = html;
 
   document.getElementById('btn-verify').addEventListener('click', verifyIdentify);
   document.getElementById('btn-next').addEventListener('click', newExercise);
+  document.getElementById('btn-next-choose').addEventListener('click', () => showGroupPicker('identify'));
 }
 
 function verifyIdentify() {
@@ -564,6 +567,7 @@ function verifyIdentify() {
 
   document.getElementById('btn-verify').classList.add('hidden');
   document.getElementById('btn-next').classList.remove('hidden');
+  document.getElementById('btn-next-choose').classList.remove('hidden');
   document.getElementById('legend').classList.remove('hidden');
 }
 
@@ -603,14 +607,64 @@ function renderFill() {
       </table>
       <div class="btn-row">
         <button class="btn btn-primary" id="btn-verify-fill">Verificar</button>
-        <button class="btn btn-secondary hidden" id="btn-next-fill">Siguiente</button>
+        <button class="btn btn-secondary hidden" id="btn-next-fill">Siguiente (azaroso)</button>
+        <button class="btn btn-secondary hidden" id="btn-next-fill-choose">Siguiente (elegir grupo)</button>
       </div>
+      <div id="group-picker-fill" class="hidden" style="margin-top:1rem;"></div>
     </div>`;
 
   document.getElementById('exercise-area').innerHTML = html;
 
   document.getElementById('btn-verify-fill').addEventListener('click', verifyFill);
   document.getElementById('btn-next-fill').addEventListener('click', newExercise);
+  document.getElementById('btn-next-fill-choose').addEventListener('click', () => showGroupPicker('fill'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GROUP PICKER
+// ═══════════════════════════════════════════════════════════════
+function showGroupPicker(mode) {
+  const pickerId = mode === 'identify' ? 'group-picker-identify' : 'group-picker-fill';
+  const picker = document.getElementById(pickerId);
+
+  // Hide next buttons while picker is open
+  if (mode === 'identify') {
+    document.getElementById('btn-next').classList.add('hidden');
+    document.getElementById('btn-next-choose').classList.add('hidden');
+  } else {
+    document.getElementById('btn-next-fill').classList.add('hidden');
+    document.getElementById('btn-next-fill-choose').classList.add('hidden');
+  }
+
+  let html = '<div style="margin-top:0.5rem;">';
+  html += '<p style="font-size:0.95rem;color:var(--muted);margin-bottom:0.8rem;">Elegí un grupo de pronombres:</p>';
+  html += '<div style="display:flex;flex-direction:column;gap:0.4rem;">';
+  for (const key of PRONOUN_KEYS) {
+    const p = PRONOUNS[key];
+    html += `<button class="btn btn-secondary" style="text-align:left;font-style:italic;"
+      onclick="chooseGroup('${key}','${mode}')">
+      <strong>${p.label}</strong> <span style="color:var(--muted);font-style:normal;font-size:0.9rem;">— ${p.meaning}</span>
+    </button>`;
+  }
+  html += '</div></div>';
+
+  picker.innerHTML = html;
+  picker.classList.remove('hidden');
+}
+
+function chooseGroup(key, mode) {
+  currentPronounKey = key;
+  verified = false;
+
+  if (mode === 'identify') {
+    const p = PRONOUNS[key];
+    const cas = rand(p.cases);
+    const col = Math.floor(Math.random() * 6);
+    currentTargetForm = { cas, col, value: p.forms[cas][col] };
+    renderIdentify();
+  } else {
+    renderFill();
+  }
 }
 
 function verifyFill() {
@@ -654,6 +708,7 @@ function verifyFill() {
 
   document.getElementById('btn-verify-fill').classList.add('hidden');
   document.getElementById('btn-next-fill').classList.remove('hidden');
+  document.getElementById('btn-next-fill-choose').classList.remove('hidden');
 }
 </script>
 </body>
