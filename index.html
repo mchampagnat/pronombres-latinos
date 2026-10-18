@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pronombres Latinos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Crimson+Pro:wght@200&display=swap');
+
+:root {
+  --bg: #f5f2ed;
+  --surface: #ffffff;
+  --ink: #1c1a17;
+  --muted: #7a756c;
+  --border: #ddd9d0;
+  --accent: #3a5a8c;
+  --accent-light: #e8edf5;
+  --correct: #2d6a3f;
+  --correct-bg: #d4edda;
+  --wrong: #8b2020;
+  --wrong-bg: #f8d7da;
+  --missed: #7a6000;
+  --missed-bg: #fff3cd;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181612;
+    --surface: #26231d;
+    --ink: #f0ece4;
+    --muted: #9a9080;
+    --border: #3a3730;
+    --accent: #6b9bd2;
+    --accent-light: #1e2a3a;
+    --correct: #6fcf97;
+    --correct-bg: #1a3a26;
+    --wrong: #eb5757;
+    --wrong-bg: #3a1a1a;
+    --missed: #f2c94c;
+    --missed-bg: #3a3010;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Crimson Pro', Georgia, serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+/* ── Start screen ── */
+#screen-start {
+  text-align: center;
+  max-width: 420px;
+  padding-top: 3rem;
+}
+
+#screen-start p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+/* ── Mode picker ── */
+.mode-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.6rem 0.4rem;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mode-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.8rem 1.5rem;
+  width: min(640px, 100%);
+  margin-bottom: 1.2rem;
+}
+
+/* ── Form to identify ── */
+.form-word {
+  font-size: 2.6rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.03em;
+}
+
+.form-pronoun-label {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin-bottom: 1.6rem;
+}
+
+/* ── Table ── */
+.declension-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.declension-table th {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.declension-table th.case-header {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.declension-table td {
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.declension-table td.case-label {
+  text-align: left;
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.declension-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Checkboxes in identify mode ── */
+.cb-cell {
+  position: relative;
+}
+
+.cb-cell input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── Fill-in inputs ── */
+.fill-input {
+  width: 100%;
+  min-width: 70px;
+  padding: 0.25rem 0.4rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--ink);
+  text-align: center;
+}
+
+.fill-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ── Cell states after verify ── */
+.cell-correct   { background: var(--correct-bg); color: var(--correct); font-weight: 600; }
+.cell-wrong     { background: var(--wrong-bg);   color: var(--wrong);   font-weight: 600; }
+.cell-missed    { background: var(--missed-bg);  color: var(--missed);  font-weight: 600; }
+
+/* ── Buttons ── */
+.btn-row {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin-top: 1.4rem;
+}
+
+.btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-primary:hover { opacity: 0.88; }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn-secondary:hover { background: var(--border); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+  font-size: 0.9rem;
+}
+
+.btn-ghost:hover { color: var(--ink); }
+
+.hidden { display: none !important; }
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.section-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem auto;
+}
+
+/* ── Merged gen/dat cells ── */
+.merged-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- Start screen -->
+<div id="screen-start">
+  <h1>Pronombres Latinos</h1>
+  <p class="subtitle">Práctica de declinación</p>
+  <p>Dos modos de ejercicio: identificar una forma declinada en la tabla, o completar la tabla completa de un pronombre.</p>
+  <button class="btn btn-primary" id="btn-begin" style="margin-top:1rem; font-size:1.1rem; padding:0.7rem 2.2rem;">Comenzar</button>
+</div>
+
+<!-- Exercise screen -->
+<div id="screen-exercise" class="hidden">
+  <h1>Pronombres Latinos</h1>
+
+  <!-- Mode switch -->
+  <div class="mode-bar" style="width:min(400px,100%); margin: 0 auto 1.8rem;">
+    <button class="mode-btn active" id="mode-identify-btn" onclick="switchMode('identify')">Identificar declinación</button>
+    <button class="mode-btn" id="mode-fill-btn" onclick="switchMode('fill')">Completar tabla</button>
+  </div>
+
+  <div id="exercise-area"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const PRONOUNS = {
+  'is-ea-id': {
+    label: 'is, ea, id',
+    meaning: 'este/a, él/ella',
+    cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+    // [masc_sg, fem_sg, neut_sg, masc_pl, fem_pl, neut_pl]
+    forms: {
+      'Nom.': ['is','ea','id','ei/ii','eae','ea'],
+      'Acus.': ['eum','eam','id','eos','eas','ea'],
+      'Gen.': ['eius','eius','eius','eorum','earum','eorum'],
+      'Dat.': ['ei','ei','ei','eis/iis','eis/iis','eis/iis'],
+      'Abl.': ['eo','ea','eo','eis/iis','eis/iis','eis/iis'],
+    }
+  },
+  'iste-ista-istud': {
+    label: 'iste, ista, istud',
+    meaning: 'ese/a',
+    cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+    forms: {
+      'Nom.': ['iste','ista','istud','isti','istae','ista'],
+      'Acus.': ['istum','istam','istud','istos','istas','ista'],
+      'Gen.': ['istius','istius','istius','istorum','istarum','istorum'],
+      'Dat.': ['isti','isti','isti','istis','istis','istis'],
+      'Abl.': ['isto','ista','isto','istis','istis','istis'],
+    }
+  },
+  'ille-illa-illud': {
+    label: 'ille, illa, illud',
+    meaning: 'aquel/aquella',
+    cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+    forms: {
+      'Nom.': ['ille','illa','illud','illi','illae','illa'],
+      'Acus.': ['illum','illam','illud','illos','illas','illa'],
+      'Gen.': ['illius','illius','illius','illorum','illarum','illorum'],
+      'Dat.': ['illi','illi','illi','illis','illis','illis'],
+      'Abl.': ['illo','illa','illo','illis','illis','illis'],
+    }
+  },
+  'hic-haec-hoc': {
+    label: 'hic, haec, hoc',
+    meaning: 'este/a (cercano)',
+    cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+    forms: {
+      'Nom.': ['hic','haec','hoc','hi','hae','haec'],
+      'Acus.': ['hunc','hanc','hoc','hos','has','haec'],
+      'Gen.': ['huius','huius','huius','horum','harum','horum'],
+      'Dat.': ['huic','huic','huic','his','his','his'],
+      'Abl.': ['hoc','hac','hoc','his','his','his'],
+    }
+  },
+  'idem-eadem-idem': {
+    label: 'idem, eadem, idem',
+    meaning: 'el mismo/la misma',
+    cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+    forms: {
+      'Nom.': ['idem','eadem','idem','eidem/iidem','eaedem','eadem'],
+      'Acus.': ['eundem','eandem','idem','eosdem','easdem','eadem'],
+      'Gen.': ['eiusdem','eiusdem','eiusdem','eorundem','earundem','eorundem'],
+      'Dat.': ['eidem','eidem','eidem','eisdem/iisdem','eisdem/iisdem','eisdem/iisdem'],
+      'Abl.': ['eodem','eadem','eodem','eisdem/iisdem','eisdem/iisdem','eisdem/iisdem'],
+    }
+  },
+  'ipse-ipsa-ipsum': {
+    label: 'ipse, ipsa, ipsum',
+    meaning: 'él mismo/ella misma',
+    cases: ['Nom.','Acus.','Gen.','Dat.','Abl.'],
+    forms: {
+      'Nom.': ['ipse','ipsa','ipsum','ipsi','ipsae','ipsa'],
+      'Acus.': ['ipsum','ipsam','ipsum','ipsos','ipsas','ipsa'],
+      'Gen.': ['ipsius','ipsius','ipsius','ipsorum','ipsarum','ipsorum'],
+      'Dat.': ['ipsi','ipsi','ipsi','ipsis','ipsis','ipsis'],
+      'Abl.': ['ipso','ipsa','ipso','ipsis','ipsis','ipsis'],
+    }
+  },
+};
+
+const COLS = ['Masc. sg.','Fem. sg.','Neut. sg.','Masc. pl.','Fem. pl.','Neut. pl.'];
+const PRONOUN_KEYS = Object.keys(PRONOUNS);
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let currentMode = 'identify';
+let currentPronounKey = null;
+let currentTargetForm = null; // { cas, col, value } for identify mode
+let verified = false;
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function normalize(s) {
+  return s.trim().toLowerCase()
+    .replace(/\s*\/\s*/g, '/')
+    .replace(/\s+/g, ' ');
+}
+
+// Given a pronoun and a form string, return all [caso, colIdx] that match
+function findAllPositions(pronounKey, targetForm) {
+  const p = PRONOUNS[pronounKey];
+  const norm = normalize(targetForm);
+  const positions = [];
+  for (const cas of p.cases) {
+    for (let c = 0; c < 6; c++) {
+      const cell = normalize(p.forms[cas][c]);
+      // Split by "/" to handle alternates like "ei/ii"
+      const variants = cell.split('/');
+      const targetVariants = norm.split('/');
+      const match = variants.some(v => targetVariants.some(t => v === t || t === v));
+      if (match) positions.push({ cas, col: c });
+    }
+  }
+  return positions;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('btn-begin').addEventListener('click', () => {
+  document.getElementById('screen-start').classList.add('hidden');
+  document.getElementById('screen-exercise').classList.remove('hidden');
+  newExercise();
+});
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-identify-btn').classList.toggle('active', mode === 'identify');
+  document.getElementById('mode-fill-btn').classList.toggle('active', mode === 'fill');
+  newExercise();
+}
+
+function newExercise() {
+  verified = false;
+  currentPronounKey = rand(PRONOUN_KEYS);
+  const p = PRONOUNS[currentPronounKey];
+
+  if (currentMode === 'identify') {
+    // Pick a random form
+    const cas = rand(p.cases);
+    const col = Math.floor(Math.random() * 6);
+    currentTargetForm = { cas, col, value: p.forms[cas][col] };
+    renderIdentify();
+  } else {
+    renderFill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// IDENTIFY MODE
+// ═══════════════════════════════════════════════════════════════
+function renderIdentify() {
+  const p = PRONOUNS[currentPronounKey];
+  const target = currentTargetForm;
+
+  let html = `
+    <div class="card">
+      <div class="form-word">${target.value}</div>
+      <div class="form-pronoun-label">Pronombre: <strong>${p.label}</strong> — ${p.meaning}</div>
+      <table class="declension-table" id="id-table">
+        <thead>
+          <tr>
+            <th class="case-header">Caso</th>
+            ${COLS.map(c => `<th>${c}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${p.cases.map(cas => `
+            <tr>
+              <td class="case-label">${cas}</td>
+              ${[0,1,2,3,4,5].map(ci => `
+                <td class="cb-cell" id="cell-${cas}-${ci}">
+                  <input type="checkbox" id="cb-${cas}-${ci}" aria-label="${cas} ${COLS[ci]}">
+                </td>
+              `).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-verify">Verificar</button>
+        <button class="btn btn-secondary hidden" id="btn-next">Siguiente</button>
+      </div>
+      <div class="legend hidden" id="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--correct-bg);border:1px solid var(--correct)"></div> Correcto</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--wrong-bg);border:1px solid var(--wrong)"></div> Incorrecto</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--missed-bg);border:1px solid var(--missed)"></div> Faltaba marcar</div>
+      </div>
+    </div>`;
+
+  document.getElementById('exercise-area').innerHTML = html;
+
+  document.getElementById('btn-verify').addEventListener('click', verifyIdentify);
+  document.getElementById('btn-next').addEventListener('click', newExercise);
+}
+
+function verifyIdentify() {
+  if (verified) return;
+  verified = true;
+
+  const p = PRONOUNS[currentPronounKey];
+  const correctPositions = findAllPositions(currentPronounKey, currentTargetForm.value);
+
+  for (const cas of p.cases) {
+    for (let ci = 0; ci < 6; ci++) {
+      const cb = document.getElementById(`cb-${cas}-${ci}`);
+      const cell = document.getElementById(`cell-${cas}-${ci}`);
+      const isCorrectPos = correctPositions.some(pos => pos.cas === cas && pos.col === ci);
+      const isChecked = cb.checked;
+
+      cb.disabled = true;
+
+      if (isChecked && isCorrectPos) {
+        cell.className = 'cb-cell cell-correct';
+      } else if (isChecked && !isCorrectPos) {
+        cell.className = 'cb-cell cell-wrong';
+      } else if (!isChecked && isCorrectPos) {
+        cell.className = 'cb-cell cell-missed';
+        // Show what the correct answer was
+        cell.innerHTML += `<br><span style="font-size:0.78rem;font-style:italic;">${p.forms[cas][ci]}</span>`;
+      }
+    }
+  }
+
+  document.getElementById('btn-verify').classList.add('hidden');
+  document.getElementById('btn-next').classList.remove('hidden');
+  document.getElementById('legend').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILL MODE
+// ═══════════════════════════════════════════════════════════════
+function renderFill() {
+  const p = PRONOUNS[currentPronounKey];
+
+  let html = `
+    <div class="card">
+      <div style="text-align:center; margin-bottom:1.4rem;">
+        <div style="font-size:1.5rem; font-weight:300; color:var(--accent); font-style:italic;">${p.label}</div>
+        <div style="font-size:0.95rem; color:var(--muted); margin-top:0.2rem;">${p.meaning}</div>
+      </div>
+      <table class="declension-table" id="fill-table">
+        <thead>
+          <tr>
+            <th class="case-header">Caso</th>
+            ${COLS.map(c => `<th>${c}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${p.cases.map(cas => `
+            <tr>
+              <td class="case-label">${cas}</td>
+              ${[0,1,2,3,4,5].map(ci => `
+                <td id="fcell-${cas}-${ci}">
+                  <input class="fill-input" id="fi-${cas}-${ci}" type="text"
+                    autocomplete="off" autocorrect="off" spellcheck="false"
+                    aria-label="${cas} ${COLS[ci]}">
+                </td>
+              `).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-verify-fill">Verificar</button>
+        <button class="btn btn-secondary hidden" id="btn-next-fill">Siguiente</button>
+      </div>
+    </div>`;
+
+  document.getElementById('exercise-area').innerHTML = html;
+
+  document.getElementById('btn-verify-fill').addEventListener('click', verifyFill);
+  document.getElementById('btn-next-fill').addEventListener('click', newExercise);
+}
+
+function verifyFill() {
+  if (verified) return;
+  verified = true;
+
+  const p = PRONOUNS[currentPronounKey];
+
+  for (const cas of p.cases) {
+    for (let ci = 0; ci < 6; ci++) {
+      const input = document.getElementById(`fi-${cas}-${ci}`);
+      const cell = document.getElementById(`fcell-${cas}-${ci}`);
+      const correct = p.forms[cas][ci];
+      const userVal = normalize(input.value);
+      const correctNorm = normalize(correct);
+
+      // Accept any variant
+      const correctVariants = correctNorm.split('/');
+      const userVariants = userVal.split('/');
+      const isCorrect = userVal.length > 0 &&
+        (correctVariants.some(cv => userVariants.some(uv => cv === uv)) ||
+         userVal === correctNorm);
+
+      input.disabled = true;
+
+      if (userVal === '') {
+        // Left blank — show correct answer in missed color
+        cell.className = 'cell-missed';
+        cell.innerHTML = `<span style="font-style:italic;">${correct}</span>`;
+      } else if (isCorrect) {
+        cell.className = 'cell-correct';
+        cell.innerHTML = `<span style="font-style:italic;">${input.value}</span>`;
+      } else {
+        cell.className = 'cell-wrong';
+        cell.innerHTML = `
+          <span style="font-style:italic;text-decoration:line-through;opacity:0.7;">${input.value}</span>
+          <br><span style="font-size:0.82rem;">${correct}</span>`;
+      }
+    }
+  }
+
+  document.getElementById('btn-verify-fill').classList.add('hidden');
+  document.getElementById('btn-next-fill').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
